@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./Assest/Css/style.css">
+    <title>Document</title>
+</head>
+<body>
+    <div class="userIdBox">
+        <h1 id="formHeading">Create your Account</h1>
+        <div class="selectors">
+            <div class="select" onclick="signupArea()">Sign Up</div>
+            <div class="select" onclick="loginArea()">Log In</div>
+        </div>
+
+        <div class="signupBox">
+            <div class="inputs">
+                    <input type="text" id="signupUserName" placeholder="Enter UserName">
+                    <input type="email" id="signupEmail" required placeholder="Enter Email">
+                    <input type="password" id="signupPassword" placeholder="Enter Password">
+                    <button onclick="createAccount()">Create Account</button>
+            </div>
+        </div>
+        <div class="loginBox">
+            <div class="inputs">
+                    <input type="email" id="loginEmail" placeholder="Enter Email">
+                    <input type="password" id="loginPassword" placeholder="Enter Password">
+                    <button onclick="loginAccount()">Login Account</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="./Assest/Js/script.js"></script>
+</body>
+</html>

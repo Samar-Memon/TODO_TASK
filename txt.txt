@@ -1,0 +1,226 @@
+let createNoteBtn = document.querySelector('.createNotes');
+let notes = document.querySelector('.notes');
+let createNoteArea = document.querySelector('.createNoteArea');
+
+let groups = document.querySelectorAll('.group');
+
+let group1 = document.getElementById('group1');
+let group2 = document.getElementById('group2');
+let group3 = document.getElementById('group3');
+let selectType = document.getElementById('selectType');
+let titleInput = document.getElementById('titleInput');
+let taskInput = document.getElementById('taskInput');
+let dateInput = document.getElementById('dateInput');
+
+let userId = document.querySelector('.userId b');
+let localvalue = localStorage.getItem('value');
+
+const localIdArray = () => {
+    return JSON.parse(localStorage.getItem('idArray'))
+}
+userId.innerHTML = localIdArray()[localvalue].username;
+
+document.querySelector('.logo a').innerHTML = `Welcome ${localIdArray()[localvalue].username}`;
+
+const createNote = () => {
+    notes.style.display = 'none';
+    createNoteArea.style.display = 'flex';
+}
+const closeCreateNote = () => {
+    createNoteArea.style.display = 'none';
+    notes.style.display = 'flex';
+}
+
+const createNoteBox = () => {
+    let date = new Date(dateInput.value).getTime();
+    let todayDate = new Date().getTime();
+    let minusdays = date - todayDate;
+    let shareDay;
+
+    let days = Math.floor(minusdays / (1000 * 60 * 60 * 24));
+    if (date >= todayDate) {
+        shareDay = days;
+    }
+
+    let titleInputValue = titleInput.value.trim().toLowerCase();
+    let taskInputValue = taskInput.value.trim().toLowerCase();
+
+    let groupName;
+    if (selectType.value == 'todo') {
+        groupName = 'To-Do Items';
+    } else if (selectType.value == 'processing') {
+        groupName = 'Processing Items';
+    } else if (selectType.value == 'completed') {
+        groupName = 'Completed Items';
+    }
+
+    let data = `<div class="title"><h2>${titleInputValue}</h2></div>
+                <div class="task"><p>${taskInputValue}</p></div>
+                <div class="bottomArea">
+                    <div class="groupName">(${groupName})</div>
+                    <div class="timer">${shareDay} Days left</div>
+                </div>
+                <div class="edit"><i class="fa-solid fa-pencil"></i></div>
+                <div class="delete"><i class="fa-solid fa-trash"></i></div>`;
+
+    let createDivForBox = document.createElement('div');
+    createDivForBox.className = 'box';
+    createDivForBox.innerHTML = data;
+    createDivForBox.setAttribute("draggable", true);
+
+    // Add drag event listeners
+    createDivForBox.addEventListener('dragstart', dragStart);
+    createDivForBox.addEventListener('dragend', dragEnd);
+
+    if (titleInputValue.length > 0 && taskInputValue.length > 0 && date >= todayDate) {
+        if (selectType.value == 'todo') {
+            group1.appendChild(createDivForBox);
+        } else if (selectType.value == 'processing') {
+            group2.appendChild(createDivForBox);
+        } else if (selectType.value == 'completed') {
+            group3.appendChild(createDivForBox);
+        }
+
+        if (shareDay > 10) {
+            createDivForBox.querySelector('.timer').style.color = 'blue';
+            createDivForBox.querySelector('.timer').style.borderColor = 'blue';
+        } else if (shareDay >= 4) {
+            createDivForBox.querySelector('.timer').style.color = 'green';
+            createDivForBox.querySelector('.timer').style.borderColor = 'green';
+        } else {
+            createDivForBox.querySelector('.timer').style.color = 'red';
+            createDivForBox.querySelector('.timer').style.borderColor = 'red';
+        }
+
+        saveNoteToLocalStorage(titleInputValue, taskInputValue, groupName, shareDay);
+
+        closeCreateNote();
+        clearInputs();
+    }
+}
+
+const clearInputs = () => {
+    document.querySelectorAll('input').forEach(input => {
+        input.value = ''
+    });
+    document.querySelector('textarea').value = '';
+}
+
+// Drag functions
+const dragStart = (e) => {
+    setTimeout(() => {
+        e.target.classList.add('hide');
+    }, 0);
+};
+
+const dragEnd = (e) => {
+    e.target.classList.remove('hide');
+};
+
+groups.forEach(group => {
+    group.addEventListener('dragover', e => {
+        e.preventDefault();
+        group.classList.add('hovered');
+    });
+
+    group.addEventListener('dragleave', () => {
+        group.classList.remove('hovered')
+    })
+    group.addEventListener('drop', () => {
+        document.querySelectorAll('.box').forEach(box => {
+            let appended = group.appendChild(box);
+            if (appended.parentElement == group1) {
+                groupName = '("To-Do Item")'
+                document.querySelector('.groupName').innerHTML = groupName
+            } else if (appended.parentElement == group2) {
+                groupName = '("Processing Item")'
+                document.querySelector('.groupName').innerHTML = groupName
+            } else if (appended.parentElement == group3) {
+                groupName = '("Completed Item")'
+                document.querySelector('.groupName').innerHTML = groupName
+            }
+        })
+
+        group.classList.remove('hovered')
+    })
+});
+
+// Function to save note to local storage
+const saveNoteToLocalStorage = (title, task, group, daysLeft) => {
+    const note = {
+        title,
+        task,
+        group,
+        daysLeft
+    };
+
+    let notesArray = localStorage.getItem('notes') ? JSON.parse(localStorage.getItem('notes')) : [];
+    notesArray.push(note);
+    localStorage.setItem('notes', JSON.stringify(notesArray));
+}
+
+// Function to load notes from local storage
+const loadNotesFromLocalStorage = () => {
+    let notesArray = localStorage.getItem('notes') ? JSON.parse(localStorage.getItem('notes')) : [];
+    notesArray.forEach(note => {
+        let data = `<div class="title"><h2>${note.title}</h2></div>
+                    <div class="task"><p>${note.task}</p></div>
+                    <div class="bottomArea">
+                        <div class="groupName">(${note.group})</div>
+                        <div class="timer">${note.daysLeft} Days left</div>
+                    </div>
+                    <div class="edit"><i class="fa-solid fa-pencil"></i></div>
+                    <div class="delete"><i class="fa-solid fa-trash"></i></div>`;
+
+        let createDivForBox = document.createElement('div');
+        createDivForBox.className = 'box';
+        createDivForBox.innerHTML = data;
+        createDivForBox.setAttribute("draggable", true);
+
+        // Add drag event listeners
+        createDivForBox.addEventListener('dragstart', dragStart);
+        createDivForBox.addEventListener('dragend', dragEnd);
+
+        if (note.group === 'To-Do Items') {
+            group1.appendChild(createDivForBox);
+        } else if (note.group === 'Processing Items') {
+            group2.appendChild(createDivForBox);
+        } else if (note.group === 'Completed Items') {
+            group3.appendChild(createDivForBox);
+        }
+
+        if (note.daysLeft > 10) {
+            createDivForBox.querySelector('.timer').style.color = 'blue';
+            createDivForBox.querySelector('.timer').style.borderColor = 'blue';
+        } else if (note.daysLeft >= 4) {
+            createDivForBox.querySelector('.timer').style.color = 'green';
+            createDivForBox.querySelector('.timer').style.borderColor = 'green';
+        } else {
+            createDivForBox.querySelector('.timer').style.color = 'red';
+            createDivForBox.querySelector('.timer').style.borderColor = 'red';
+        }
+    });
+}
+
+// Load notes when the page loads
+document.addEventListener('DOMContentLoaded', loadNotesFromLocalStorage);
+
+// Function to delete note
+const deleteNote = (event) => {
+    if (event.target.classList.contains('fa-trash')) {
+        const noteBox = event.target.closest('.box');
+        let title = noteBox.querySelector('.title h2').innerText;
+        noteBox.remove();
+        removeNoteFromLocalStorage(title);
+    }
+};
+
+// Add event listener for delete buttons
+document.addEventListener('click', deleteNote);
+
+// Function to remove note from local storage
+const removeNoteFromLocalStorage = (title) => {
+    let notesArray = localStorage.getItem('notes') ? JSON.parse(localStorage.getItem('notes')) : [];
+    notesArray = notesArray.filter(note => note.title !== title);
+    localStorage.setItem('notes', JSON.stringify(notesArray));
+}
