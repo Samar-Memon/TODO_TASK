@@ -34,7 +34,7 @@ const createAccount = () => {
 
         localStorage.setItem('idArray', JSON.stringify(idArray))
     }else{
-        alert('Values Sahi Likho')
+        alert('Please Fill All Inputs.')
     }
 }
 
@@ -53,10 +53,11 @@ const loginAccount = () => {
                     }, 1000)
                 }else{
                     alert('Invalid!\nEmail or Password')
+                    break;
                 }
             }
         }else{
-            alert('Login Err')
+            alert('Please Fill All Inputs.')
         }
 }
 const signupArea = () => {
