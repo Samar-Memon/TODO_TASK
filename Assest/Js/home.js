@@ -15,12 +15,22 @@ let dateInput = document.getElementById('dateInput');
 let userId = document.querySelector('.userId b');
 let localvalue = localStorage.getItem('value');
 
+const logout = () => {
+    document.querySelector('.logout').classList.toggle('show')
+}
+document.querySelector('.logout').addEventListener('click', () => {
+    history.back();
+    setTimeout(() => {
+        location.reload();
+    }, 1200)
+})
+
 const localIdArray = () => {
     return JSON.parse(localStorage.getItem('idArray'));
 };
 userId.innerHTML = localIdArray()[localvalue].username;
 
-document.querySelector('.logo a').innerHTML = `Welcome ${localIdArray()[localvalue].username}`;
+document.querySelector('.logo a').innerHTML = `Welcome "${localIdArray()[localvalue].username.toUpperCase()}"`;
 
 const createNote = () => {
     notes.style.display = 'none';
@@ -107,13 +117,13 @@ const createNoteBox = () => {
         }
 
         if (shareDay > 10) {
-            createDivForBox.querySelector('.timer').style.color = 'blue';
+            createDivForBox.querySelector('.timer').style.background = 'blue';
             createDivForBox.querySelector('.timer').style.borderColor = 'blue';
         } else if (shareDay >= 4) {
-            createDivForBox.querySelector('.timer').style.color = 'green';
+            createDivForBox.querySelector('.timer').style.background = 'green';
             createDivForBox.querySelector('.timer').style.borderColor = 'green';
         } else {
-            createDivForBox.querySelector('.timer').style.color = 'red';
+            createDivForBox.querySelector('.timer').style.background = 'red';
             createDivForBox.querySelector('.timer').style.borderColor = 'red';
         }
 
